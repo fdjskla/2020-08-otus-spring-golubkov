@@ -1,2 +1,5 @@
-# 2020-08-otus-spring-golubkov
-Homeworks for Spring course
+# Homeworks for Spring course
+
+group 2020-08 
+Aleksei Golubkov
+

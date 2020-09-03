@@ -4,11 +4,18 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="quizParser" class="ru.otus.quiz.parser.QuizCsvParser">
+    <bean id="ioService" class="ru.otus.infrastructure.ConsoleIOService">
+        <constructor-arg name="output" value="#{T(java.lang.System).out}"/>
+        <constructor-arg name="input" value="#{T(java.lang.System).in}"/>
+    </bean>
+
+    <bean id="quizDao" class="ru.otus.quiz.dao.QuizCsvDao">
         <constructor-arg value="/quiz.csv"/>
     </bean>
 
     <bean id="quizRunner" class="ru.otus.quiz.SimpleQuizRunner">
+        <constructor-arg name="quizDao" ref="quizDao"/>
+        <constructor-arg name="ioService" ref="ioService"/>
     </bean>
 
 </beans>

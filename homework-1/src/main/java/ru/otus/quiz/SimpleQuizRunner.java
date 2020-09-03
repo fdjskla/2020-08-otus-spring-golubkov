@@ -1,19 +1,23 @@
 package ru.otus.quiz;
 
+import lombok.AllArgsConstructor;
+import ru.otus.infrastructure.IOService;
+import ru.otus.quiz.dao.QuizDao;
 import ru.otus.quiz.domain.Quiz;
-import ru.otus.quiz.domain.QuizConfig;
 
-import java.util.Scanner;
-
+@AllArgsConstructor
 class SimpleQuizRunner implements QuizRunner {
 
-    public void runQuiz(QuizConfig quizConfig) {
-        final Quiz quiz = quizConfig.getQuiz();
-        final Scanner scanner = new Scanner(System.in);
+    private final QuizDao quizDao;
+    private final IOService ioService;
+
+    public void runQuiz() {
+        final Quiz quiz = quizDao.loadQuiz();
         while (!quiz.quizIsOver()) {
-            System.out.println(quiz.nextQuestion());
-            quiz.answerIsCorrect(scanner.next());
+            ioService.printLine(quiz.nextQuestion());
+            quiz.answerIsCorrect(ioService.readLine());
         }
-        System.out.println(quiz.quizResults());
+
+        ioService.printLine(quiz.quizResults());
     }
 }

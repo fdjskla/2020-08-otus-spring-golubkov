@@ -1,9 +1,9 @@
-package ru.otus.quiz.parser;
+package ru.otus.quiz.dao;
 
 import lombok.AllArgsConstructor;
-import ru.otus.Main;
-import ru.otus.quiz.domain.QuizConfig;
+import ru.otus.quiz.domain.Quiz;
 import ru.otus.quiz.domain.QuizQuestion;
+import ru.otus.quiz.domain.SimpleQuiz;
 import ru.otus.quiz.exception.QuizParsingException;
 
 import java.io.BufferedReader;
@@ -15,16 +15,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-class QuizCsvParser implements QuizParser {
+class QuizCsvDao implements QuizDao {
 
     private static final String DELIMETER = ",";
 
     private final String resource;
 
     @Override
-    public QuizConfig parse() {
+    public Quiz loadQuiz() {
         try (
-                InputStream quizStream = QuizCsvParser.class.getResourceAsStream(resource);
+                InputStream quizStream = QuizCsvDao.class.getResourceAsStream(resource);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(quizStream));
         ) {
             List<QuizQuestion> quizQuestions = bufferedReader
@@ -42,7 +42,7 @@ class QuizCsvParser implements QuizParser {
                         );
                     })
                     .collect(Collectors.toList());
-            return new QuizConfig(quizQuestions);
+            return new SimpleQuiz(quizQuestions);
         } catch (IOException e) {
             throw new QuizParsingException(e);
         }

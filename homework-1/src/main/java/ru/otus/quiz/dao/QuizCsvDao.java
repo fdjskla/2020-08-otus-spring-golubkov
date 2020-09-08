@@ -1,6 +1,7 @@
 package ru.otus.quiz.dao;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import ru.otus.quiz.domain.Quiz;
 import ru.otus.quiz.domain.QuizQuestion;
 import ru.otus.quiz.domain.SimpleQuiz;
@@ -14,12 +15,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@Component
 class QuizCsvDao implements QuizDao {
 
     private static final String DELIMETER = ",";
 
     private final String resource;
+    private final Integer pointToPass;
+
+    public QuizCsvDao(
+            @Value("${quiz.data.source}") String resource,
+            @Value("${quiz.pass.points}") Integer pointToPass
+    ) {
+        this.resource = resource;
+        this.pointToPass = pointToPass;
+    }
 
     @Override
     public Quiz loadQuiz() {
@@ -42,7 +52,7 @@ class QuizCsvDao implements QuizDao {
                         );
                     })
                     .collect(Collectors.toList());
-            return new SimpleQuiz(quizQuestions);
+            return new SimpleQuiz(quizQuestions, pointToPass);
         } catch (IOException e) {
             throw new QuizParsingException(e);
         }

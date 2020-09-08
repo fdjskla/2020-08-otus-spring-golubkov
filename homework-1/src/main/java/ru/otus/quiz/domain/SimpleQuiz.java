@@ -2,16 +2,24 @@ package ru.otus.quiz.domain;
 
 import ru.otus.quiz.exception.QuizIsOverException;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class SimpleQuiz implements Quiz {
 
-    private final List<QuizQuestion> questions;
-    private int questionNumber;
+    private static final String QUIZ_RESULTS = "Thank you for taking our quiz. Your result is %d/%d. You %s";
 
-    public SimpleQuiz(List<QuizQuestion> questions) {
+    private final List<QuizQuestion> questions;
+    private final int pointsToPass;
+    private int questionNumber;
+    private Boolean[] results;
+
+    public SimpleQuiz(List<QuizQuestion> questions, int pointsToPass) {
         this.questions = questions;
+        this.pointsToPass = pointsToPass;
         this.questionNumber = 0;
+        this.results = new Boolean[questions.size()];
     }
 
     @Override
@@ -31,11 +39,19 @@ public class SimpleQuiz implements Quiz {
 
     @Override
     public boolean answerIsCorrect(String answer) {
-        return answer.strip().equalsIgnoreCase(questions.get(questionNumber - 1).getAnswer());
+        final boolean correct = answer.strip().equalsIgnoreCase(questions.get(questionNumber - 1).getAnswer());
+        results[questionNumber - 1] = correct;
+        return correct;
     }
 
     @Override
     public String quizResults() {
-        return "Thank you for taking our quiz";
+        final long numberOfRightAnswers = Arrays.stream(results)
+                .filter(obj -> Objects.nonNull(obj) && obj)
+                .count();
+        String result = numberOfRightAnswers > pointsToPass
+                ? "passed!"
+                : "should try next time.";
+        return String.format(QUIZ_RESULTS, numberOfRightAnswers, results.length, result);
     }
 }

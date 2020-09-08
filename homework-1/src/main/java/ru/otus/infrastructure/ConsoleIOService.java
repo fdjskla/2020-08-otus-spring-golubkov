@@ -1,18 +1,15 @@
 package ru.otus.infrastructure;
 
-import java.io.InputStream;
+import lombok.AllArgsConstructor;
+
 import java.io.PrintStream;
 import java.util.Scanner;
 
+@AllArgsConstructor
 public class ConsoleIOService implements IOService {
 
     private final PrintStream output;
     private final Scanner input;
-
-    public ConsoleIOService(PrintStream output, InputStream input) {
-        this.output = output;
-        this.input = new Scanner(input);
-    }
 
     @Override
     public void printLine(String line) {
@@ -21,6 +18,6 @@ public class ConsoleIOService implements IOService {
 
     @Override
     public String readLine() {
-        return input.next();
+        return input.nextLine();
     }
 }

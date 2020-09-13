@@ -1,0 +1,4 @@
+quiz:
+  dataSource: "/quiz.csv"
+  passPoints: 3
+  locale: ru_RU

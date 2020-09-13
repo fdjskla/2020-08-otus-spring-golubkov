@@ -1,3 +1,5 @@
-#Homework 1
+#Homework 2
 
-Simple Spring app configured with xml that shows quiz questions
+- Quiz with answers check
+- Spring configuration with annotations and java config
+- Logging aspect

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -11,8 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggingAspect {
 
-    @Before("@target(ru.otus.logging.Loggable)")
+    @Pointcut("@annotation(ru.otus.logging.Loggable)")
+    public void allLoggable() {}
+
+    @Before("allLoggable()")
     public void log(JoinPoint joinPoint) {
-        log.info("Quiz run : " + joinPoint.getSignature().getName());
+        log.info("Method run : " + joinPoint.getSignature().getName());
     }
 }

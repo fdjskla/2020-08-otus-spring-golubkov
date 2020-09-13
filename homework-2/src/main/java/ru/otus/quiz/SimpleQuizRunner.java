@@ -7,7 +7,6 @@ import ru.otus.logging.Loggable;
 import ru.otus.quiz.dao.QuizDao;
 import ru.otus.quiz.domain.Quiz;
 
-@Loggable
 @Service
 @AllArgsConstructor
 class SimpleQuizRunner implements QuizRunner {
@@ -15,6 +14,7 @@ class SimpleQuizRunner implements QuizRunner {
     private final QuizDao quizDao;
     private final IOService ioService;
 
+    @Loggable
     public void runQuiz() {
         final Quiz quiz = quizDao.loadQuiz();
         while (!quiz.quizIsOver()) {

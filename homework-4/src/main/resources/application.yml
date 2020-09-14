@@ -1,0 +1,8 @@
+quiz:
+  dataSource: "/quiz.csv"
+  passPoints: 3
+  locale: ru_RU
+
+shell:
+  hello: "shell.hello"
+  error: "shell.error"

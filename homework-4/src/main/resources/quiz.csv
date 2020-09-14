@@ -1,0 +1,6 @@
+question,answer,option1,option2,option3,option4
+question.course,question.course.answer,question.course.option1,question.course.option2,question.course.option3,question.course.option4
+question.pre,question.pre.answer,question.pre.option1,question.pre.option2,question.pre.option3,question.pre.option4
+question.ide,question.ide.answer,question.ide.option1,question.ide.option2,question.ide.option3
+question.mult,question.mult.answer
+question.version,question.version.answer,question.version.option1,question.version.option2,question.version.option3,question.version.option4

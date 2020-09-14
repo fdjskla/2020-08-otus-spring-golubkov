@@ -8,22 +8,18 @@ import java.util.Objects;
 
 public class SimpleQuiz implements Quiz {
 
-    private static final String QUIZ_RESULTS = "Thank you for taking our quiz. Your result is %d/%d. You %s";
-
     private final List<QuizQuestion> questions;
-    private final int pointsToPass;
     private int questionNumber;
     private Boolean[] results;
 
-    public SimpleQuiz(List<QuizQuestion> questions, int pointsToPass) {
+    public SimpleQuiz(List<QuizQuestion> questions) {
         this.questions = questions;
-        this.pointsToPass = pointsToPass;
         this.questionNumber = 0;
         this.results = new Boolean[questions.size()];
     }
 
     @Override
-    public boolean quizIsOver() {
+    public boolean isQuizOver() {
         return questionNumber >= questions.size();
     }
 
@@ -38,20 +34,19 @@ public class SimpleQuiz implements Quiz {
     }
 
     @Override
-    public boolean answerIsCorrect(String answer) {
-        final boolean correct = answer.strip().equalsIgnoreCase(questions.get(questionNumber - 1).getAnswer());
-        results[questionNumber - 1] = correct;
-        return correct;
+    public void answer(String answer) {
+        results[questionNumber - 1] = answer.strip().equalsIgnoreCase(questions.get(questionNumber - 1).getAnswer());
     }
 
     @Override
-    public String quizResults() {
-        final long numberOfRightAnswers = Arrays.stream(results)
+    public long result() {
+        return Arrays.stream(results)
                 .filter(obj -> Objects.nonNull(obj) && obj)
                 .count();
-        String result = numberOfRightAnswers > pointsToPass
-                ? "passed!"
-                : "should try next time.";
-        return String.format(QUIZ_RESULTS, numberOfRightAnswers, results.length, result);
+    }
+
+    @Override
+    public long numberOfQuestions() {
+        return questions.size();
     }
 }

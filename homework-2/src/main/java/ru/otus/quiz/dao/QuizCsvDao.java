@@ -21,14 +21,11 @@ class QuizCsvDao implements QuizDao {
     private static final String DELIMETER = ",";
 
     private final String resource;
-    private final Integer pointToPass;
 
     public QuizCsvDao(
-            @Value("${quiz.data.source}") String resource,
-            @Value("${quiz.pass.points}") Integer pointToPass
+            @Value("${quiz.data.source}") String resource
     ) {
         this.resource = resource;
-        this.pointToPass = pointToPass;
     }
 
     @Override
@@ -52,7 +49,7 @@ class QuizCsvDao implements QuizDao {
                         );
                     })
                     .collect(Collectors.toList());
-            return new SimpleQuiz(quizQuestions, pointToPass);
+            return new SimpleQuiz(quizQuestions);
         } catch (IOException e) {
             throw new QuizParsingException(e);
         }

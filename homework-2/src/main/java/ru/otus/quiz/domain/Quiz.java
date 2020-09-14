@@ -9,6 +9,4 @@ public interface Quiz {
     void answer(String answer);
 
     long result();
-
-    long numberOfQuestions();
 }

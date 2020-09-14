@@ -44,9 +44,4 @@ public class SimpleQuiz implements Quiz {
                 .filter(obj -> Objects.nonNull(obj) && obj)
                 .count();
     }
-
-    @Override
-    public long numberOfQuestions() {
-        return questions.size();
-    }
 }

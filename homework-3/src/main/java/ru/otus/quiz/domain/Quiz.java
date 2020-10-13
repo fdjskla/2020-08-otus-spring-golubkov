@@ -2,11 +2,11 @@ package ru.otus.quiz.domain;
 
 public interface Quiz {
 
-    boolean quizIsOver();
+    boolean isQuizOver();
 
     String nextQuestion();
 
-    boolean answerIsCorrect(String answer);
+    void answer(String answer);
 
-    String quizResults();
+    long result();
 }

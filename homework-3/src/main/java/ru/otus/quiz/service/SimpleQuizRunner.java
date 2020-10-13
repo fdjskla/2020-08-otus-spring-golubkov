@@ -1,4 +1,4 @@
-package ru.otus.quiz;
+package ru.otus.quiz.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,13 @@ class SimpleQuizRunner implements QuizRunner {
     private final IOService ioService;
 
     @Loggable
-    public void runQuiz() {
+    public long runQuiz() {
         final Quiz quiz = quizDao.loadQuiz();
-        while (!quiz.quizIsOver()) {
+        while (!quiz.isQuizOver()) {
             ioService.printLine(quiz.nextQuestion());
-            quiz.answerIsCorrect(ioService.readLine());
+            quiz.answer(ioService.readLine());
         }
 
-        ioService.printLine(quiz.quizResults());
+        return quiz.result();
     }
 }

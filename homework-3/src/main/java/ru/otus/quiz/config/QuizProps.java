@@ -11,17 +11,8 @@ import java.util.Locale;
 @NoArgsConstructor
 public class QuizProps {
 
-    private String dataSource;
     private Integer passPoints;
     private Locale locale;
-
-    public String getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(String dataSource) {
-        this.dataSource = dataSource;
-    }
 
     public Integer getPassPoints() {
         return passPoints;

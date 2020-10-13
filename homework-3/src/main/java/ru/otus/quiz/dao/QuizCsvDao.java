@@ -23,14 +23,16 @@ import java.util.stream.Collectors;
 class QuizCsvDao implements QuizDao {
 
     private static final String DELIMETER = ",";
+    private static final String QUIZ_SOURCE = "quiz.source";
 
     private final QuizProps quizProps;
     private final MessageSource quizLocalization;
 
     @Override
     public Quiz loadQuiz() {
+        final String source = quizLocalization.getMessage(QUIZ_SOURCE, null, quizProps.getLocale());
         try (
-                InputStream quizStream = QuizCsvDao.class.getResourceAsStream(quizProps.getDataSource());
+                InputStream quizStream = QuizCsvDao.class.getResourceAsStream(source);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(quizStream));
         ) {
             List<QuizQuestion> quizQuestions = bufferedReader
@@ -38,7 +40,7 @@ class QuizCsvDao implements QuizDao {
                     .skip(1)
                     .map(this::toQuizQuestion)
                     .collect(Collectors.toList());
-            return new SimpleQuiz(quizQuestions, quizProps.getPassPoints());
+            return new SimpleQuiz(quizQuestions);
         } catch (IOException e) {
             throw new QuizParsingException(e);
         }
@@ -49,12 +51,6 @@ class QuizCsvDao implements QuizDao {
         if (params.length < 2) {
             throw new QuizParsingException("Question and answer are mandatory");
         }
-        final Locale locale = quizProps.getLocale();
-        final String localizedQuestion = quizLocalization.getMessage(params[0], new String[]{}, locale);
-        final String localizedAnswer = quizLocalization.getMessage(params[1], new String[]{}, locale);
-        final List<String> localizedOptions = Arrays.asList(params).subList(2, params.length).stream()
-                .map(option -> quizLocalization.getMessage(option, new String[]{}, locale))
-                .collect(Collectors.toList());
-        return new QuizQuestion(localizedQuestion, localizedAnswer, localizedOptions);
+        return new QuizQuestion(params[0], params[1], Arrays.asList(params).subList(2, params.length));
     }
 }

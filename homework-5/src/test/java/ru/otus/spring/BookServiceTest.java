@@ -61,11 +61,10 @@ public class BookServiceTest {
     @Test
     @DisplayName("delete book")
     public void deleteBook() {
-        final List<Book> all = bookService.getAll();
         bookService.delete(BOOK_ONE.getId());
-        assertThat(bookService.getAll())
-                .hasSize(all.size() - 1)
-                .noneMatch(book -> book.getId().equals(BOOK_ONE.getId()));
+
+        final Optional<Book> deleted = bookService.getById(BOOK_ONE.getId());
+        assertThat(deleted).isEmpty();
     }
 
     @Test
@@ -95,7 +94,7 @@ public class BookServiceTest {
         final List<Book> all = bookService.getAll();
         assertThat(all)
                 .hasSize(3)
-                .filteredOn(book -> book.getId() > 2)
+                .filteredOn(book -> book.getId() > BOOK_TWO.getId())
                 .hasSize(1)
                 .element(0)
                 .extracting(

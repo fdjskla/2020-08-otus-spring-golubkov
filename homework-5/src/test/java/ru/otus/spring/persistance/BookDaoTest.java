@@ -54,11 +54,9 @@ public class BookDaoTest {
     @Test
     @DisplayName("delete book")
     public void deleteBook() {
-        final List<Book> all = bookDao.getAll();
         bookDao.deleteById(BOOK_ONE.getId());
-        assertThat(bookDao.getAll())
-                .hasSize(all.size() - 1)
-                .noneMatch(book -> book.getId().equals(BOOK_ONE.getId()));
+        final Book deleted = bookDao.getById(BOOK_ONE.getId());
+        assertThat(deleted).isNull();
     }
 
     @Test
@@ -84,12 +82,8 @@ public class BookDaoTest {
         Book newBook = new Book(null, "newTitle", "newText", new Author(2L, "NewAuthor"), new Genre(1L, "romance"));
         final Long bookKey = bookDao.insert(newBook);
         newBook.setId(bookKey);
-        final List<Book> all = bookDao.getAll();
-        assertThat(all)
-                .hasSize(3)
-                .filteredOn(book -> book.getId() > 2)
-                .hasSize(1)
-                .element(0)
+        final Book newBookFromDb = bookDao.getById(bookKey);
+        assertThat(newBookFromDb)
                 .usingRecursiveComparison()
                 .isEqualTo(newBook);
     }

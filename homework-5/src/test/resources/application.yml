@@ -1,4 +1,5 @@
 spring:
   datasource:
     url: jdbc:h2:mem:testdb
+    port: 0
     data: data-test.sql

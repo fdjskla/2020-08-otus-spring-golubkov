@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface BookDao {
 
-    void insert(Book book);
+    Long insert(Book book);
 
     void update(Book book);
 

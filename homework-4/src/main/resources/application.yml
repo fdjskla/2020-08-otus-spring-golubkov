@@ -1,8 +1,13 @@
 quiz:
-  dataSource: "/quiz.csv"
+  source: "/quiz_%s.csv"
   passPoints: 3
-  locale: ru_RU
-
+  success: "quiz.result.success"
+  fail: "quiz.result.fail"
 shell:
   hello: "shell.hello"
   error: "shell.error"
+spring:
+  messages:
+    basename: i18n/messages
+    fallback-to-system-locale: false
+    encoding: UTF-8

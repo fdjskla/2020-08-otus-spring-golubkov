@@ -1,7 +1,6 @@
 package ru.otus.quiz.dao;
 
 import lombok.AllArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import ru.otus.quiz.config.QuizProps;
 import ru.otus.quiz.domain.Quiz;
@@ -25,35 +24,30 @@ class QuizCsvDao implements QuizDao {
     private static final String DELIMETER = ",";
 
     private final QuizProps quizProps;
-    private final MessageSource quizLocalization;
 
     @Override
     public Quiz loadQuiz(Locale locale) {
+        final String source = String.format(quizProps.getSource(), locale.getLanguage());
         try (
-                InputStream quizStream = QuizCsvDao.class.getResourceAsStream(quizProps.getDataSource());
+                InputStream quizStream = QuizCsvDao.class.getResourceAsStream(source);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(quizStream));
         ) {
             List<QuizQuestion> quizQuestions = bufferedReader
                     .lines()
                     .skip(1)
-                    .map(line -> toQuizQuestion(line, locale))
+                    .map(this::toQuizQuestion)
                     .collect(Collectors.toList());
-            return new SimpleQuiz(quizQuestions, quizProps.getPassPoints());
+            return new SimpleQuiz(quizQuestions);
         } catch (IOException e) {
             throw new QuizParsingException(e);
         }
     }
 
-    private QuizQuestion toQuizQuestion(String line, Locale locale) {
+    private QuizQuestion toQuizQuestion(String line) {
         String[] params = line.split(DELIMETER);
         if (params.length < 2) {
             throw new QuizParsingException("Question and answer are mandatory");
         }
-        final String localizedQuestion = quizLocalization.getMessage(params[0], new String[]{}, locale);
-        final String localizedAnswer = quizLocalization.getMessage(params[1], new String[]{}, locale);
-        final List<String> localizedOptions = Arrays.asList(params).subList(2, params.length).stream()
-                .map(option -> quizLocalization.getMessage(option, new String[]{}, locale))
-                .collect(Collectors.toList());
-        return new QuizQuestion(localizedQuestion, localizedAnswer, localizedOptions);
+        return new QuizQuestion(params[0], params[1], Arrays.asList(params).subList(2, params.length));
     }
 }

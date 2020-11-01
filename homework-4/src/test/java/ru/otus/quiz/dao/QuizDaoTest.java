@@ -3,41 +3,43 @@ package ru.otus.quiz.dao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.MessageSource;
-import ru.otus.quiz.config.QuizProps;
+import org.springframework.shell.jline.InteractiveShellApplicationRunner;
+import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import ru.otus.quiz.exception.QuizParsingException;
 
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+@SpringBootTest(
+        properties = {
+                InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false",
+                ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false"
+        }
+)
 class QuizDaoTest {
 
-    private final Locale en = Locale.ENGLISH;
-
     @Autowired
-    private MessageSource quizLocalization;
+    private QuizCsvDao parser;
 
     @Test
     void testEmptyQuizParsing() {
-        final var parser = new QuizCsvDao(new QuizProps("/empty.csv", 1, en), quizLocalization);
-        final var quiz = parser.loadQuiz(en);
-        assertTrue(quiz.quizIsOver());
+        final var quiz = parser.loadQuiz(Locale.ENGLISH);
+        assertThat(quiz.isQuizOver()).isTrue();
     }
 
     @Test
     void testQuizWithoutAnswerParsing() {
-        final var parser = new QuizCsvDao(new QuizProps("/noAnswer.csv", 1, en), quizLocalization);
-        assertThrows(QuizParsingException.class, () -> parser.loadQuiz(en));
+        assertThrows(QuizParsingException.class, () -> parser.loadQuiz(Locale.FRENCH));
     }
 
     @Test
     void testQuizWithoutNoOptions() {
-        final var parser = new QuizCsvDao(new QuizProps("/noOptions.csv", 1, en), quizLocalization);
-        final var quiz = parser.loadQuiz(en);
-        assertEquals("What is the result of equation \"2*2\"?" + System.lineSeparator() + "[]", quiz.nextQuestion());
-        assertTrue(quiz.answerIsCorrect("4"));
-        assertTrue(quiz.quizIsOver());
+        final var quiz = parser.loadQuiz(Locale.CHINESE);
+        assertThat("What is the result of equation \"2*2\"?" + System.lineSeparator() + "[]").isEqualTo(quiz.nextQuestion());
+        quiz.answer("4");
+        assertThat(quiz.isQuizOver()).isTrue();
+        assertThat(quiz.result()).isEqualTo(1);
     }
 }

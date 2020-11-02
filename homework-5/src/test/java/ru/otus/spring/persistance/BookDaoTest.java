@@ -3,10 +3,8 @@ package ru.otus.spring.persistance;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.shell.jline.InteractiveShellApplicationRunner;
-import org.springframework.shell.jline.ScriptShellApplicationRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
 import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
 import ru.otus.spring.domain.Genre;
@@ -16,13 +14,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("BookDao should ")
-@SpringBootTest(
-        properties = {
-                InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false",
-                ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false"
-        }
-)
-@Transactional
+@JdbcTest
+@Import(JdbcBookDao.class)
 public class BookDaoTest {
 
     private static final String UPDATED_TEXT = "updated";
@@ -30,7 +23,7 @@ public class BookDaoTest {
     private static final Book BOOK_TWO = new Book(2L, "someTitle", "bla-bla-bla", new Author(2L, "NewAuthor"), new Genre(2L, "detective"));
 
     @Autowired
-    private BookDao bookDao;
+    private JdbcBookDao bookDao;
 
     @Test
     @DisplayName("get all books")

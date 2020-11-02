@@ -4,37 +4,47 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
 import ru.otus.spring.domain.Genre;
+import ru.otus.spring.persistance.AuthorDao;
+import ru.otus.spring.persistance.BookDao;
+import ru.otus.spring.persistance.GenreDao;
 import ru.otus.spring.service.BookService;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 @DisplayName("book service should ")
 @SpringBootTest(properties = {
         InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false",
         ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false"
 })
-@Transactional
 public class BookServiceTest {
 
     private static final String UPDATED_TEXT = "updated";
-    private static final Book BOOK_ONE = new Book(1L, "bookTitle", "text", new Author(1L, "Author1"), new Genre(1L, "romance"));
-    private static final Book BOOK_TWO = new Book(2L, "someTitle", "bla-bla-bla", new Author(2L, "NewAuthor"), new Genre(2L, "detective"));
+    private static final Book BOOK_ONE = new Book(3L, "bookTitle1", "text0", new Author(3L, "Author1"), new Genre(3L, "romance"));
+    private static final Book BOOK_TWO = new Book(4L, "someTitle2", "bla-bla", new Author(4L, "NewAuthor"), new Genre(4L, "detective"));
 
+    @MockBean
+    private BookDao bookDao;
+    @MockBean
+    private AuthorDao authorDao;
+    @MockBean
+    private GenreDao genreDao;
     @Autowired
     private BookService bookService;
 
     @Test
     @DisplayName("get all books")
     public void getAllTest() {
+        when(bookDao.getAll()).thenReturn(List.of(BOOK_ONE, BOOK_TWO));
         final List<Book> all = bookService.getAll();
         assertThat(all)
                 .hasSize(2)
@@ -45,6 +55,7 @@ public class BookServiceTest {
     @Test
     @DisplayName("get no book for unknown id")
     public void notFoundById() {
+        when(bookDao.getById(175L)).thenReturn(null);
         final Optional<Book> book = bookService.getById(175L);
         assertThat(book).isEmpty();
     }
@@ -52,6 +63,7 @@ public class BookServiceTest {
     @Test
     @DisplayName("get book by id")
     public void getById() {
+        when(bookDao.getById(BOOK_ONE.getId())).thenReturn(BOOK_ONE);
         final Optional<Book> book = bookService.getById(BOOK_ONE.getId());
         assertThat(book.get())
                 .usingRecursiveComparison()
@@ -62,9 +74,7 @@ public class BookServiceTest {
     @DisplayName("delete book")
     public void deleteBook() {
         bookService.delete(BOOK_ONE.getId());
-
-        final Optional<Book> deleted = bookService.getById(BOOK_ONE.getId());
-        assertThat(deleted).isEmpty();
+        verify(bookDao, times(1)).deleteById(BOOK_ONE.getId());
     }
 
     @Test
@@ -78,11 +88,7 @@ public class BookServiceTest {
                 BOOK_ONE.getGenre()
         );
         bookService.update(updated);
-
-        assertThat(bookService.getById(BOOK_ONE.getId()))
-                .get()
-                .extracting(Book::getText)
-                .isEqualTo(UPDATED_TEXT);
+        verify(bookDao, timeout(1)).update(updated);
     }
 
     @Test
@@ -90,26 +96,7 @@ public class BookServiceTest {
     public void insertBook() {
         Book newBook = new Book(null, "newTitle", "newText", new Author(null, "myAuthor"), new Genre(null, "myGenre"));
         bookService.insert(newBook);
-
-        final List<Book> all = bookService.getAll();
-        assertThat(all)
-                .hasSize(3)
-                .filteredOn(book -> book.getId() > BOOK_TWO.getId())
-                .hasSize(1)
-                .element(0)
-                .extracting(
-                        Book::getTitle,
-                        Book::getText,
-                        book -> book.getAuthor().getName(),
-                        book -> book.getGenre().getName()
-                )
-                .asList()
-                .containsExactly(
-                        newBook.getTitle(),
-                        newBook.getText(),
-                        newBook.getAuthor().getName(),
-                        newBook.getGenre().getName()
-                );
+        verify(bookDao, times(1)).insert(newBook);
     }
 
 }

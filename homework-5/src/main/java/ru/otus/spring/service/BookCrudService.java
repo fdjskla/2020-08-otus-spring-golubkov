@@ -1,5 +1,6 @@
 package ru.otus.spring.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.domain.Author;
@@ -10,30 +11,15 @@ import ru.otus.spring.persistance.BookDao;
 import ru.otus.spring.persistance.GenreDao;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class BookCrudService implements BookService {
 
     private final AuthorDao authorDao;
     private final GenreDao genreDao;
     private final BookDao bookDao;
-    private final Map<String, Genre> genres;
-
-    public BookCrudService(AuthorDao authorDao, GenreDao genreDao, BookDao bookDao) {
-        this.authorDao = authorDao;
-        this.genreDao = genreDao;
-        this.bookDao = bookDao;
-        this.genres = genreDao.getAll()
-                .stream()
-                .collect(Collectors.toMap(
-                        Genre::getName,
-                        Function.identity()
-                ));
-    }
 
     @Override
     @Transactional
@@ -72,20 +58,21 @@ public class BookCrudService implements BookService {
     }
 
     private void checkAndUpdateGenre(Book book) {
-        final String genreName = book.getGenre().getName();
-        Genre genre = genres.get(genreName);
-        if (genre == null) {
-            final Long newGenreId = genreDao.insert(book.getGenre());
-            genre = new Genre(newGenreId, genreName);
-            genres.put(genreName, genre);
+        final Genre genre = book.getGenre();
+        Genre genreFromDb = genreDao.getByName(genre.getName());
+        final Long newGenreId;
+        if (genreFromDb == null) {
+            newGenreId = genreDao.insert(genre);
+        } else {
+            newGenreId = genreFromDb.getId();
         }
-        book.setGenre(genre);
+        genre.setId(newGenreId);
     }
 
     private void checkAndUpdateAuthor(Book book) {
         final Author author = book.getAuthor();
         final Author authorFromDB = authorDao.getByName(author.getName());
-        Long authorId = null;
+        final Long authorId;
         if (authorFromDB == null) {
             authorId = authorDao.insert(author);
         } else {

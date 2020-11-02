@@ -14,5 +14,7 @@ public interface GenreDao {
 
     Genre getById(long id);
 
+    Genre getByName(String name);
+
     List<Genre> getAll();
 }

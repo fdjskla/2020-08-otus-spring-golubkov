@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Genre;
 
 import java.util.List;
@@ -46,6 +45,12 @@ public class JdbcGenreDao implements GenreDao {
     public Genre getById(long id) {
         final Map<String, Object> params = Map.of("id", id);
         return jdbc.queryForObject("select id, name from genres where id = :id", params, new GenreMapper());
+    }
+
+    @Override
+    public Genre getByName(String name) {
+        final Map<String, Object> params = Map.of("name", name);
+        return jdbc.queryForObject("select id, name from genres where name = :name", params, new GenreMapper());
     }
 
     @Override

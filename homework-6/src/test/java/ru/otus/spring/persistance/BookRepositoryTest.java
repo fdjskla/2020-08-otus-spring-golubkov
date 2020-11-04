@@ -73,7 +73,7 @@ public class BookRepositoryTest {
     @Test
     @DisplayName("insert book")
     public void insertBook() {
-        Book newBook = new Book(0l, "newTitle", "newText", new Author(2L, "NewAuthor"), new Genre(1L, "romance"));
+        Book newBook = new Book(null, "newTitle", "newText", new Author(2L, "NewAuthor"), new Genre(1L, "romance"));
         final Book savedBook = bookRepository.save(newBook);
 
         final Book newBookFromDb = bookRepository.getById(savedBook.getId());

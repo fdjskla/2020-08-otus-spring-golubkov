@@ -60,27 +60,21 @@ public class BookCrudService implements BookService {
     private void checkAndUpdateGenre(Book book) {
         final Genre genre = book.getGenre();
         Genre genreFromDb = genreRepository.getByName(genre.getName());
-        final Long newGenreId;
-        if (genreFromDb == null) {
-            Genre saved = genreRepository.save(genre);
-            newGenreId = saved.getId();
-        } else {
-            newGenreId = genreFromDb.getId();
+        if (genreFromDb != null) {
+            book.setGenre(genreFromDb);
         }
-        genre.setId(newGenreId);
+        Genre saved = genreRepository.save(genre);
+        book.setGenre(saved);
     }
 
     private void checkAndUpdateAuthor(Book book) {
         final Author author = book.getAuthor();
         final Author authorFromDB = authorRepository.getByName(author.getName());
-        final Long authorId;
-        if (authorFromDB == null) {
-            Author saved = authorRepository.save(author);
-            authorId = saved.getId();
-        } else {
-            authorId = authorFromDB.getId();
+        if (authorFromDB != null) {
+            book.setAuthor(authorFromDB);
         }
-        author.setId(authorId);
+        final Author saved = authorRepository.save(author);
+        book.setAuthor(saved);
     }
 
 }

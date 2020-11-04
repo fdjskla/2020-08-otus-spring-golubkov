@@ -1,3 +1,3 @@
-#Homework 5
+#Homework 6
 
-- h2 jdbc book edit crud app
+- h2 jpa book with comments edit crud app

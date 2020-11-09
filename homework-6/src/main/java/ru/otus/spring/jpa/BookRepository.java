@@ -8,6 +8,8 @@ public interface BookRepository {
 
     List<Book> getAll();
 
+    List<Book> getAllWithComments();
+
     Book getById(long id);
 
     Book save(Book book);

@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class BookView {
 
-    private String title;
-    private String text;
-    private String author;
-    private String genre;
+    private final String title;
+    private final String text;
+    private final String author;
+    private final String genre;
 
     public String toShellView() {
         return "Book{" +

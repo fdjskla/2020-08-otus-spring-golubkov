@@ -16,3 +16,7 @@ insert into genres (`name`) values('biography');
 insert into books(`title`, `text`, `author_id`, `genre_id`) values('title', 'text', 1, 1);
 insert into books(`title`, `text`, `author_id`, `genre_id`) values('title1', 'text1', 2, 2);
 insert into books(`title`, `text`, `author_id`, `genre_id`) values('title2', 'text2', 3, 3);
+
+insert into comments(`book_id`, `user`, `text`) values(1, 'Kolya', 'too long');
+insert into comments(`book_id`, `user`, `text`) values(1, 'Vasya', 'great');
+insert into comments(`book_id`, `user`, `text`) values(2, 'Petya', 'read later');

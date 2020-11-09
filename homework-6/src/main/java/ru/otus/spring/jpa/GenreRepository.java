@@ -12,7 +12,7 @@ public interface GenreRepository {
 
     Genre getByName(String name);
 
-    Genre save(Genre book);
+    Genre save(Genre genre);
 
     void deleteById(long id);
 }

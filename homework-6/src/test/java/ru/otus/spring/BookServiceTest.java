@@ -29,8 +29,8 @@ import static org.mockito.Mockito.*;
 public class BookServiceTest {
 
     private static final String UPDATED_TEXT = "updated";
-    private static final Book BOOK_ONE = new Book(3L, "bookTitle1", "text0", new Author(3L, "Author1"), new Genre(3L, "romance"));
-    private static final Book BOOK_TWO = new Book(4L, "someTitle2", "bla-bla", new Author(4L, "NewAuthor"), new Genre(4L, "detective"));
+    private static final Book BOOK_ONE = new Book(3L, "bookTitle1", "text0", new Author(3L, "Author1"), new Genre(3L, "romance"), List.of());
+    private static final Book BOOK_TWO = new Book(4L, "someTitle2", "bla-bla", new Author(4L, "NewAuthor"), new Genre(4L, "detective"), List.of());
 
     @MockBean
     private BookRepository bookRepository;
@@ -87,7 +87,8 @@ public class BookServiceTest {
                 BOOK_ONE.getTitle(),
                 UPDATED_TEXT,
                 BOOK_ONE.getAuthor(),
-                BOOK_ONE.getGenre()
+                BOOK_ONE.getGenre(),
+                List.of()
         );
         bookService.update(updated);
         verify(bookRepository, timeout(1)).save(updated);
@@ -96,7 +97,7 @@ public class BookServiceTest {
     @Test
     @DisplayName("insert book")
     public void insertBook() {
-        Book newBook = new Book(null, "newTitle", "newText", new Author(null, "myAuthor"), new Genre(null, "myGenre"));
+        Book newBook = new Book(null, "newTitle", "newText", new Author(null, "myAuthor"), new Genre(null, "myGenre"), List.of());
         when(authorRepository.getByName(newBook.getAuthor().getName())).thenReturn(newBook.getAuthor());
         when(genreRepository.getByName(newBook.getGenre().getName())).thenReturn(newBook.getGenre());
 

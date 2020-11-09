@@ -1,7 +1,6 @@
 package ru.otus.spring.jpa;
 
 import ru.otus.spring.domain.Author;
-import ru.otus.spring.domain.Book;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ public interface AuthorRepository {
 
     Author getByName(String name);
 
-    Author save(Author book);
+    Author save(Author author);
 
     void deleteById(long id);
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
@@ -28,7 +29,8 @@ public class BookRepositoryTest {
     static {
         bookTwo.setComments(List.of(COMMENT_ONE, COMMENT_TWO));
     }
-
+    @Autowired
+    private TestEntityManager entityManager;
     @Autowired
     private BookRepositoryJPA bookRepository;
 
@@ -55,7 +57,7 @@ public class BookRepositoryTest {
     @DisplayName("delete book")
     public void deleteBook() {
         bookRepository.deleteById(BOOK_ONE.getId());
-        final Book deleted = bookRepository.getById(BOOK_ONE.getId());
+        final Book deleted = entityManager.getEntityManager().find(Book.class, BOOK_ONE.getId());
         assertThat(deleted).isNull();
     }
 
@@ -72,7 +74,7 @@ public class BookRepositoryTest {
         );
         bookRepository.save(updated);
 
-        assertThat(bookRepository.getById(BOOK_ONE.getId()))
+        assertThat(entityManager.getEntityManager().find(Book.class, BOOK_ONE.getId()))
                 .extracting(Book::getText)
                 .isEqualTo(UPDATED_TEXT);
     }
@@ -83,7 +85,7 @@ public class BookRepositoryTest {
         Book newBook = new Book(null, "newTitle", "newText", new Author(2L, "NewAuthor"), new Genre(1L, "romance"), List.of());
         final Book savedBook = bookRepository.save(newBook);
 
-        final Book newBookFromDb = bookRepository.getById(savedBook.getId());
+        final Book newBookFromDb = entityManager.getEntityManager().find(Book.class, savedBook.getId());
         assertThat(newBookFromDb)
                 .usingRecursiveComparison()
                 .isEqualTo(newBook);

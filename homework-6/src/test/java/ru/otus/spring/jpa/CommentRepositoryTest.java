@@ -4,12 +4,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
 import ru.otus.spring.domain.Comment;
 import ru.otus.spring.domain.Genre;
 
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +30,8 @@ public class CommentRepositoryTest {
         bookTwo.setComments(List.of(COMMENT_ONE, COMMENT_TWO));
     }
 
+    @Autowired
+    private TestEntityManager entityManager;
     @Autowired
     private CommentRepositoryJPA commentRepository;
 
@@ -54,7 +58,7 @@ public class CommentRepositoryTest {
     @DisplayName("delete comment")
     public void delete() {
         commentRepository.deleteById(COMMENT_ONE.getId());
-        final Comment deleted = commentRepository.getById(COMMENT_ONE.getId());
+        final Comment deleted = entityManager.getEntityManager().find(Comment.class, COMMENT_ONE.getId());
         assertThat(deleted).isNull();
     }
 
@@ -63,7 +67,8 @@ public class CommentRepositoryTest {
     public void update() {
         commentRepository.update(COMMENT_ONE.getId(), UPDATED_TEXT);
 
-        assertThat(commentRepository.getById(COMMENT_ONE.getId()))
+        final Comment updated = entityManager.getEntityManager().find(Comment.class, COMMENT_ONE.getId());
+        assertThat(updated)
                 .extracting(Comment::getText)
                 .isEqualTo(UPDATED_TEXT);
     }
@@ -75,7 +80,8 @@ public class CommentRepositoryTest {
         final String newText = "newText";
         commentRepository.create(bookTwo.getId(), userName, newText);
 
-        final List<Comment> newComment = commentRepository.getByUser(userName);
+        final TypedQuery<Comment> commentsQuery = entityManager.getEntityManager().createQuery("select c from Comment c where c.user = '" + userName + "'", Comment.class);
+        final List<Comment> newComment = commentsQuery.getResultList();
         assertThat(newComment)
                 .hasSize(1)
                 .element(0)

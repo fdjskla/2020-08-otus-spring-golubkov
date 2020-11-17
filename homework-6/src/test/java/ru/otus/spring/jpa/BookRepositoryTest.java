@@ -1,4 +1,4 @@
-package ru.otus.spring.persistance;
+package ru.otus.spring.jpa;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,6 @@ import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
 import ru.otus.spring.domain.Comment;
 import ru.otus.spring.domain.Genre;
-import ru.otus.spring.jpa.BookRepositoryJPA;
 
 import java.util.List;
 

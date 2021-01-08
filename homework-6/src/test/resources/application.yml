@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    port: 0
+    data: data-test.sql
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+      show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect

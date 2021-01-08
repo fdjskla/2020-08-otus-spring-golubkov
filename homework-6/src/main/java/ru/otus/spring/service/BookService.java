@@ -16,6 +16,4 @@ public interface BookService {
     Optional<Book> getById(Long id);
 
     List<Book> getAll();
-
-    List<Book> getAllWithComments();
 }

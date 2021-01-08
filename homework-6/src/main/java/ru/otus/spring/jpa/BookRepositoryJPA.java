@@ -1,6 +1,5 @@
 package ru.otus.spring.jpa;
 
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 import ru.otus.spring.domain.Book;
 
@@ -27,22 +26,8 @@ public class BookRepositoryJPA implements BookRepository {
     }
 
     @Override
-    public List<Book> getAllWithComments() {
-        final EntityGraph<?> booksEntityGraph = em.getEntityGraph("books-entity-graph-comments");
-
-        final TypedQuery<Book> booksQuery = em.createQuery("select b from Book b ", Book.class)
-                .setHint("javax.persistence.fetchgraph", booksEntityGraph);
-
-        return booksQuery.getResultList();
-    }
-
-    @Override
     public Book getById(long id) {
-        final Book book = em.find(Book.class, id);
-        if (book != null) {
-            Hibernate.initialize(book.getComments());
-        }
-        return book;
+        return em.find(Book.class, id);
     }
 
     @Override

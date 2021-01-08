@@ -57,12 +57,6 @@ public class BookCrudService implements BookService {
         return bookRepository.getAll();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Book> getAllWithComments() {
-        return bookRepository.getAllWithComments();
-    }
-
     private void checkAndUpdateGenre(Book book) {
         final Genre genre = book.getGenre();
         Genre genreFromDb = genreRepository.getByName(genre.getName());

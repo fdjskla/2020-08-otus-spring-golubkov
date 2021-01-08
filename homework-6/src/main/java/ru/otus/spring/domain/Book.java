@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,10 +13,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "books")
-@NamedEntityGraph(name = "books-entity-graph",
-        attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genre")})
-@NamedEntityGraph(name = "books-entity-graph-comments",
-        attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genre"), @NamedAttributeNode("comments")})
+@NamedEntityGraph(name = "books-entity-graph", attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genre")})
 public class Book {
 
     @Id
@@ -38,7 +34,4 @@ public class Book {
     @ManyToOne(targetEntity = Genre.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "genre_id")
     private Genre genre;
-
-    @OneToMany(targetEntity = Comment.class, fetch = FetchType.LAZY, mappedBy = "book")
-    private List<Comment> comments;
 }

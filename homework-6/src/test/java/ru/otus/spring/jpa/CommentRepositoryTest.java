@@ -22,13 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CommentRepositoryTest {
 
     private static final String UPDATED_TEXT = "updated comment";
-    private static Book bookTwo = new Book(2L, "someTitle", "bla-bla-bla", new Author(2L, "NewAuthor"), new Genre(2L, "detective"), List.of());
-    private static final Comment COMMENT_ONE = new Comment(1L, bookTwo, "Petya", "text");
-    private static final Comment COMMENT_TWO = new Comment(2L, bookTwo, "Vasya", "bla-bla-bla");
-
-    static {
-        bookTwo.setComments(List.of(COMMENT_ONE, COMMENT_TWO));
-    }
+    private static final Book BOOK_TWO = new Book(2L, "someTitle", "bla-bla-bla", new Author(2L, "NewAuthor"), new Genre(2L, "detective"));
+    private static final Comment COMMENT_ONE = new Comment(1L, BOOK_TWO, "Petya", "text");
+    private static final Comment COMMENT_TWO = new Comment(2L, BOOK_TWO, "Vasya", "bla-bla-bla");
 
     @Autowired
     private TestEntityManager entityManager;
@@ -37,12 +33,15 @@ public class CommentRepositoryTest {
 
     @Test
     @DisplayName("get all comments by book")
-    public void getAll() {
-        final List<Comment> bookTwoComments = commentRepository.getByBook(bookTwo.getId());
+    public void getAllByBook() {
+        final List<Comment> bookTwoComments = commentRepository.getByBook(BOOK_TWO.getId());
         assertThat(bookTwoComments)
                 .hasSize(2)
-                .usingRecursiveFieldByFieldElementComparator()
-                .containsExactlyInAnyOrder(COMMENT_ONE, COMMENT_TWO);
+                .flatExtracting(Comment::getId, Comment::getUser, Comment::getText)
+                .containsExactly(
+                        COMMENT_ONE.getId(), COMMENT_ONE.getUser(), COMMENT_ONE.getText(),
+                        COMMENT_TWO.getId(), COMMENT_TWO.getUser(), COMMENT_TWO.getText()
+                );
     }
 
     @Test
@@ -50,8 +49,8 @@ public class CommentRepositoryTest {
     public void getById() {
         final Comment comment = commentRepository.getById(COMMENT_ONE.getId());
         assertThat(comment)
-                .usingRecursiveComparison()
-                .isEqualTo(COMMENT_ONE);
+                .extracting(Comment::getId, Comment::getUser, Comment::getText)
+                .containsExactly(COMMENT_ONE.getId(), COMMENT_ONE.getUser(), COMMENT_ONE.getText());
     }
 
     @Test
@@ -75,10 +74,10 @@ public class CommentRepositoryTest {
 
     @Test
     @DisplayName("add comment")
-    public void insertBook() {
+    public void insertComment() {
         final String userName = "userName";
         final String newText = "newText";
-        commentRepository.create(bookTwo.getId(), userName, newText);
+        commentRepository.create(BOOK_TWO.getId(), userName, newText);
 
         final TypedQuery<Comment> commentsQuery = entityManager.getEntityManager().createQuery("select c from Comment c where c.user = '" + userName + "'", Comment.class);
         final List<Comment> newComment = commentsQuery.getResultList();
@@ -86,7 +85,7 @@ public class CommentRepositoryTest {
                 .hasSize(1)
                 .element(0)
                 .extracting(comment -> comment.getBook().getId(), Comment::getText)
-                .containsExactly(bookTwo.getId(), newText);
+                .containsExactly(BOOK_TWO.getId(), newText);
     }
 
 }

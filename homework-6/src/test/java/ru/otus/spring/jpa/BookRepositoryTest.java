@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
-import ru.otus.spring.domain.Comment;
 import ru.otus.spring.domain.Genre;
 
 import java.util.List;
@@ -21,14 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BookRepositoryTest {
 
     private static final String UPDATED_TEXT = "updated";
-    private static final Book BOOK_ONE = new Book(1L, "bookTitle", "text", new Author(1L, "Author1"), new Genre(1L, "romance"), List.of());
-    private static Book bookTwo = new Book(2L, "someTitle", "bla-bla-bla", new Author(2L, "NewAuthor"), new Genre(2L, "detective"), List.of());
-    private static final Comment COMMENT_ONE = new Comment(1L, bookTwo, "Petya", "text");
-    private static final Comment COMMENT_TWO = new Comment(2L, bookTwo, "Vasya", "bla-bla-bla");
+    private static final Book BOOK_ONE = new Book(1L, "bookTitle", "text", new Author(1L, "Author1"), new Genre(1L, "romance"));
+    private static final Book BOOK_TWO = new Book(2L, "someTitle", "bla-bla-bla", new Author(2L, "NewAuthor"), new Genre(2L, "detective"));
 
-    static {
-        bookTwo.setComments(List.of(COMMENT_ONE, COMMENT_TWO));
-    }
     @Autowired
     private TestEntityManager entityManager;
     @Autowired
@@ -41,16 +35,16 @@ public class BookRepositoryTest {
         assertThat(all)
                 .hasSize(2)
                 .usingRecursiveFieldByFieldElementComparator()
-                .containsExactlyInAnyOrder(BOOK_ONE, bookTwo);
+                .containsExactlyInAnyOrder(BOOK_ONE, BOOK_TWO);
     }
 
     @Test
     @DisplayName("get book by id")
     public void getById() {
-        final Book book = bookRepository.getById(bookTwo.getId());
+        final Book book = bookRepository.getById(BOOK_TWO.getId());
         assertThat(book)
                 .usingRecursiveComparison()
-                .isEqualTo(bookTwo);
+                .isEqualTo(BOOK_TWO);
     }
 
     @Test
@@ -69,8 +63,7 @@ public class BookRepositoryTest {
                 BOOK_ONE.getTitle(),
                 UPDATED_TEXT,
                 BOOK_ONE.getAuthor(),
-                BOOK_ONE.getGenre(),
-                List.of()
+                BOOK_ONE.getGenre()
         );
         bookRepository.save(updated);
 
@@ -82,7 +75,7 @@ public class BookRepositoryTest {
     @Test
     @DisplayName("insert book")
     public void insertBook() {
-        Book newBook = new Book(null, "newTitle", "newText", new Author(2L, "NewAuthor"), new Genre(1L, "romance"), List.of());
+        Book newBook = new Book(null, "newTitle", "newText", new Author(2L, "NewAuthor"), new Genre(1L, "romance"));
         final Book savedBook = bookRepository.save(newBook);
 
         final Book newBookFromDb = entityManager.getEntityManager().find(Book.class, savedBook.getId());

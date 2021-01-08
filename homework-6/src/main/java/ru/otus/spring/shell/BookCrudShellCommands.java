@@ -8,6 +8,7 @@ import ru.otus.spring.domain.Author;
 import ru.otus.spring.domain.Book;
 import ru.otus.spring.domain.Genre;
 import ru.otus.spring.service.BookService;
+import ru.otus.spring.service.CommentService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class BookCrudShellCommands {
 
     private final BookService bookService;
+    private final CommentService commentService;
 
     @ShellMethod(value = "Insert book", key = {"ib", "insertBook"})
     public void insert(
@@ -25,7 +27,7 @@ public class BookCrudShellCommands {
             @ShellOption String author,
             @ShellOption String genre
     ) {
-        final Book book = new Book(null, title, text, new Author(null, author), new Genre(null, genre), List.of());
+        final Book book = new Book(null, title, text, new Author(null, author), new Genre(null, genre));
         bookService.insert(book);
     }
 
@@ -37,7 +39,7 @@ public class BookCrudShellCommands {
             @ShellOption("a") String author,
             @ShellOption("g") String genre
     ) {
-        final Book book = new Book(id, title, text, new Author(null, author), new Genre(null, genre), List.of());
+        final Book book = new Book(id, title, text, new Author(null, author), new Genre(null, genre));
         bookService.update(book);
     }
 
@@ -49,9 +51,12 @@ public class BookCrudShellCommands {
     }
 
     @ShellMethod(value = "Get book by id", key = {"gb", "getBook"})
-    public String getbyId(
+    public String getById(
             @ShellOption Long id
     ) {
+        List<CommentView> comments = commentService.getCommentsForBook(id).stream()
+                .map(comment -> new CommentView(comment.getUser(), comment.getText()))
+                .collect(Collectors.toList());
         return bookService.getById(id)
                 .map(book ->
                         new BookWithCommentsView(
@@ -61,9 +66,7 @@ public class BookCrudShellCommands {
                                         book.getAuthor().getName(),
                                         book.getGenre().getName()
                                 ),
-                                book.getComments().stream()
-                                        .map(comment -> new CommentView(comment.getUser(), comment.getText()))
-                                        .collect(Collectors.toList())
+                                comments
                         ).toShellView()
                 )
                 .orElse("no book found");
@@ -74,26 +77,6 @@ public class BookCrudShellCommands {
         return bookService.getAll().stream()
                 .map(b -> new BookView(b.getTitle(), b.getText(), b.getAuthor().getName(), b.getGenre().getName()))
                 .map(BookView::toShellView)
-                .collect(Collectors.joining("\n"));
-    }
-
-    @ShellMethod(value = "Get all books with comments", key = {"abc", "allBooksComments"})
-    public String getAllWithComments() {
-        return bookService.getAllWithComments().stream()
-                .map(b -> new BookWithCommentsView(
-                                new BookView(
-                                        b.getTitle(),
-                                        b.getText(),
-                                        b.getAuthor().getName(),
-                                        b.getGenre().getName()
-                                ),
-                                b.getComments()
-                                        .stream()
-                                        .map(comment -> new CommentView(comment.getUser(), comment.getText()))
-                                        .collect(Collectors.toList())
-                        )
-                )
-                .map(BookWithCommentsView::toShellView)
                 .collect(Collectors.joining("\n"));
     }
 
